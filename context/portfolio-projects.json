@@ -1,0 +1,198 @@
+{
+  "projects": [
+    
+{
+  "id": "learnverge-course-selling-platform",
+  "title": "LearnVerge – Course Selling Platform",
+
+  "summary": "A full-stack course selling platform where instructors can upload and manage video-based courses, and students can browse, subscribe, and track their learning progress with an integrated video player.",
+
+  "mediaLinks": [ "https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783732994/Screenshot_2026-07-11_at_06.38.13_y8x9co.png", "https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783732994/Screenshot_2026-07-11_at_06.38.49_dp1ayu.png", "https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783732994/Screenshot_2026-07-11_at_06.38.49_dp1ayu.png" ] ,
+
+  "technologies": [
+    "React 19",
+    "Vite",
+    "Tailwind CSS v4",
+    "Radix UI",
+    "Redux Toolkit",
+    "React Query (TanStack)",
+    "React Router v7",
+    "React Hook Form + Zod",
+    "Axios",
+    "Shadcn/ui (via Radix + CVA)",
+    "Express.js v5",
+    "MongoDB (Mongoose)",
+    "Redis",
+    "RabbitMQ (amqplib)",
+    "Cloudinary",
+    "FFmpeg (fluent-ffmpeg)",
+    "JWT + bcrypt",
+    "Google OAuth (google-auth-library)",
+    "Multer",
+    "Rust (Tokio + Lapin)",
+    "Docker / Docker Compose",
+    "Nginx",
+    "pnpm"
+  ],
+
+  "role": "Full-stack developer – backend API, Rust worker, React frontend, DevOps (Docker, Nginx, CI)",
+
+  "whatItDoes": "Provides an end-to-end online learning experience: instructors create courses with video lessons (uploaded via chunked Cloudinary uploads), and students can browse course catalogs, subscribe to courses, stream HLS video, view PDF notes, and track lesson completion.",
+
+  "problem": "Aspiring educators lack an affordable, self-hostable platform to sell and deliver video courses, while students need a seamless way to discover, purchase, and consume course content with progress tracking.",
+
+  "approach": "Three-service architecture — a Node.js/Express REST API handles auth, course CRUD, and enrollment; a Rust-based async worker (Tokio + Lapin) consumes RabbitMQ jobs for heavy-lifting tasks like video transcoding via FFmpeg and Cloudinary uploads; and a React SPA served via Nginx provides the student/instructor UI. MongoDB stores course and user data, Redis handles caching/sessions, and Docker Compose orchestrates all services with health checks, resource limits, and security hardening.",
+
+  "highlights": [
+    "Polyglot backend: Node.js API + high-performance Rust worker for CPU-bound video processing",
+    "Chunked video uploads to Cloudinary with progress tracking and resumable uploads",
+    "RabbitMQ message queue decouples API from heavy media processing tasks",
+    "Dual auth: JWT cookie-based auth + Google OAuth sign-in",
+    "Role-based access for students and instructors with separate dashboards",
+    "HLS video streaming with FFmpeg-generated adaptive playlists",
+    "Course completion tracking at the per-lesson level",
+    "Production-ready Docker Compose with read-only containers, resource caps, PID limits, and no-new-privileges",
+    "Radix UI + Shadcn/ui component system with Tailwind CSS v4 for a polished, accessible frontend",
+    "Input validation with Zod on both client and server",
+    "Vercel-ready frontend config with SPA fallback routing"
+  ],
+
+  "links": {
+    "live": "https://learnverge.site",
+    "github": "https://github.com/its-YogeshChandra/CourseSelllingApp"
+  },
+
+  "status": "in production"
+}
+,
+    
+{
+  "id": "streamweaver",
+  "title": "Streamweaver",
+
+  "summary": "A context-aware encrypted video delivery platform exposed as an API. Upload an MP4 and CipherStream's AI pipeline automatically transcribes, detects sensitive content, applies AES-128 encrypted HLS streaming, generates chapters, and produces seek-bar thumbnail sprites — all with zero FFmpeg or crypto code on the client side.",
+
+  "mediaLinks" : ["https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783731609/Screenshot_2026-07-11_at_02.15.19_nwnout.png", "https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783731609/Screenshot_2026-07-11_at_02.15.39_iw5ym2.png", "https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783731610/Screenshot_2026-07-11_at_06.28.31_orlpwr.png"],
+    "technologies": [
+    "Rust",
+    "Actix-Web",
+    "Tokio",
+    "Diesel ORM",
+    "Next.js 16",
+    "React 19",
+    "TypeScript",
+    "Tailwind CSS 4",
+    "Framer Motion",
+    "Recharts",
+    "Clerk Auth",
+    "PostgreSQL 16",
+    "Redis 7",
+    "Whisper.cpp",
+    "FFmpeg",
+    "AES-128 Encryption",
+    "Cloudflare R2 / AWS S3",
+    "Cloudinary",
+    "Docker",
+    "Docker Compose"
+  ],
+
+  "role": "Full-stack developer — designed the architecture, built the Rust API gateway and async worker pipeline, implemented the Next.js frontend with Clerk auth, and containerized the entire stack with Docker Compose.",
+
+  "whatItDoes": "Provides a single API endpoint where developers upload a raw MP4 video and receive back: an AES-128 encrypted HLS adaptive stream, AI-generated chapter markers (WebVTT), a full timestamped transcript, seek-bar thumbnail sprites, and a content-sensitivity threat analysis — all delivered via CDN with a key server that enforces auth on every decryption key request.",
+
+  "problem": "Building secure video infrastructure is extremely complex. Developers today must manually configure FFmpeg, OpenSSL, and transcription pipelines; handle resumable uploads for large files; implement content-aware encryption policies; and manage ephemeral processing infrastructure — often resulting in months of DevOps work, fragile pipelines, and endless security audits.",
+
+  "approach": "A fully decoupled, event-driven microservice architecture with four layers: (1) A Rust/Actix-Web API gateway that accepts uploads and responds instantly with 202 Accepted, (2) A Redis queue that bridges the fast HTTP layer with slow video processing, (3) A Rust async worker that runs a parallel pipeline — Branch A handles audio extraction → Whisper transcription → AI chapter generation, while Branch B handles AES key generation → encrypted HLS transcode + sprite generation — both branches execute concurrently via Tokio, (4) S3-compatible cloud storage with CDN delivery and a dedicated key server that never stores encryption keys alongside video segments.",
+
+  "highlights": [
+    "Parallel processing pipeline: audio (WAV → Whisper → chapters) and video (AES → HLS → sprites) branches run concurrently via Tokio, cutting total processing time nearly in half",
+    "Context-aware encryption: Whisper transcripts are scanned for financial keywords, PII patterns, and compliance terms to automatically determine threat level and encryption strength (static vs. rotating AES keys)",
+    "Zero-trust key architecture: AES decryption keys are stored in PostgreSQL and served by the Rust API with per-request auth — even a full S3 bucket exfiltration yields nothing playable",
+    "Whisper.cpp integration: Self-hosted speech-to-text via a dedicated Docker container running the whisper-server binary, producing word-level timestamps at ~6x realtime on CPU",
+    "AI-powered chapter generation: Transcripts are segmented into intelligent chapters using NLP topic analysis with keyword overlap merging",
+    "Full Docker Compose orchestration: 6-service stack (PostgreSQL, Redis, Whisper server, Rust backend, Rust worker, Next.js frontend) with health checks and dependency ordering",
+    "Chunked upload support: Frontend uses Cloudinary chunked uploads for large video files with progress tracking",
+    "Clerk JWT authentication: Full auth flow with JWKS validation on the Rust backend and protected Next.js routes",
+    "Sprite sheet generation: FFmpeg captures frames every 5 seconds and tiles them into a single JPEG sprite with a companion VTT for seek-bar preview",
+    "Memory-optimized design: Entire processing pipeline fits within ~771 MB peak RAM, comfortable on a 2 GB VPS"
+  ],
+
+  
+  "links": {
+    "live": "https://streamweaver.seclan.live",
+    "github": "https://github.com/its-YogeshChandra/StreamweaverV2"
+  },
+
+  "status": "in production "
+},
+
+{
+  "id": "amipay-ai-powered-stablecoin-remittance",
+  "title": "Amipay — AI-Powered Stablecoin Remittance",
+
+  "summary": "A conversational remittance app where natural-language commands like 'Send $100 to Mom' are parsed by an AI model, validated by a Rust backend, and settled on-chain via Solana smart contracts using USDC stablecoins.",
+
+  "image": "./frontend/assets/images/amypay-logo.png",
+
+  "mediaLinks": ["https://player.cloudinary.com/embed/?cloud_name=dp6i6a3xy&public_id=amipay-up_d3pak9", "https://player.cloudinary.com/embed/?cloud_name=dp6i6a3xy&public_id=amipay_lyydyy"],
+
+  "technologies": [
+    "Rust",
+    "Actix Web",
+    "Diesel ORM",
+    "PostgreSQL",
+    "Solana",
+    "Anchor Framework",
+    "SPL Token",
+    "React Native (Expo)",
+    "TypeScript",
+    "Expo Router",
+    "NativeWind / Tailwind CSS",
+    "Solana Mobile Wallet Adapter",
+    "@solana/web3.js",
+    "Axios",
+    "React Native Reanimated",
+    "DeepSeek AI (OpenAI-compatible API)",
+    "JWT (jsonwebtoken)",
+    "bcrypt",
+    "Jupiter Aggregator (DEX)",
+    "Docker / Docker Compose",
+    "Nginx (Reverse Proxy + SSL)",
+    "Prisma (Database Utility)",
+    "Let's Encrypt (TLS)"
+  ],
+
+  "role": "Full-stack developer — backend (Rust), smart contracts (Solana/Anchor), mobile frontend (React Native/Expo), AI integration, DevOps (Docker/Nginx)",
+
+  "whatItDoes": "Lets users send USDC stablecoin payments through a chat-like mobile interface using plain English commands. The AI parses user intent (transfers, balance checks, transaction history), the backend validates and orchestrates the flow (balance checks, recipient resolution, confirmation prompts), and the Solana smart contract executes the on-chain USDC transfer — all without the user needing to understand wallets, token accounts, or blockchain mechanics.",
+
+  "problem": "Cross-border remittances are slow, expensive, and confusing. Traditional services charge high fees and take days. Crypto solves the cost and speed problem but introduces wallet complexity that most users can't navigate. Amipay removes that friction by letting users interact in natural language while the system handles all blockchain operations behind the scenes.",
+
+  "approach": "Three-layer architecture with strict security boundaries: (1) A React Native / Expo mobile app provides a chat UI and tab-based navigation for home, contacts, activities, cards, and payments. (2) A Rust/Actix Web backend acts as the central orchestrator — it forwards user messages to a DeepSeek AI model for structured intent parsing (the AI never sees keys, balances, or addresses), validates the parsed intent, resolves recipients from PostgreSQL, checks on-chain balances, and builds/submits Solana transactions. (3) An Anchor smart contract on Solana manages PDA-based vaults and executes USDC transfers via the SPL Token interface. The system uses a custodial model where the backend holds signing authority, with JWT authentication, bcrypt password hashing, and WebSocket support for real-time multi-step conversational flows. Docker Compose orchestrates the services, and Nginx handles SSL termination and reverse proxying.",
+
+  "highlights": [
+    "AI-powered natural language intent parsing — users say 'Send $100 to Mom' instead of filling forms",
+    "Strict AI security boundary — the model is a pure translator that never sees private keys, wallet addresses, or balances",
+    "Solana smart contract with PDA-based vault architecture for secure, program-controlled USDC transfers",
+    "Multi-step conversational transaction flow with recipient disambiguation and explicit user confirmation",
+    "Jupiter DEX aggregator integration for on-chain token swaps",
+    "React Native mobile app with Expo Router, tab navigation, wallet connect, and Solana Mobile Wallet Adapter support",
+    "Rust backend delivering memory safety, high performance, and type-safe database queries via Diesel ORM",
+    "Dockerized deployment with Nginx reverse proxy, SSL via Let's Encrypt, and WebSocket upgrade support",
+    "Prisma-based database utility for schema management alongside Diesel migrations",
+    "Custodial wallet model for frictionless UX — no wallet setup required from the user"
+  ],
+
+  "links": {
+    "live": null,
+    "github": null,
+    "figma": null,
+    "docs": "./README.md",
+    "contract_explorer": "https://explorer.solana.com/address/HeHSU8GmNjDF7kwM7j2fbheeigdZD9AJzeMC2u5SGCs5?cluster=devnet",
+    "domain": "amypay.fun"
+  },
+
+  "status": "in development — backend API, smart contract, and mobile frontend are functional; WebSocket orchestrator, full transaction flow, and production deployment are in progress"
+}
+  ]
+}
