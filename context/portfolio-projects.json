@@ -72,7 +72,7 @@
 
   "summary": "A context-aware encrypted video delivery platform exposed as an API. Upload an MP4 and CipherStream's AI pipeline automatically transcribes, detects sensitive content, applies AES-128 encrypted HLS streaming, generates chapters, and produces seek-bar thumbnail sprites — all with zero FFmpeg or crypto code on the client side.",
 
-  "mediaLinks" : ["https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783731609/Screenshot_2026-07-11_at_02.15.19_nwnout.png", "https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783731609/Screenshot_2026-07-11_at_02.15.39_iw5ym2.png", "https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783731610/Screenshot_2026-07-11_at_06.28.31_orlpwr.png"],
+  "mediaLinks" : ["https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783731609/Screenshot_2026-07-11_at_02.15.19_nwnout.png", "https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783731609/Screenshot_2026-07-11_at_02.15.39_iw5ym2.png", "https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783732994/Screenshot_2026-07-11_at_06.39.16_wcuhma.png"],
     "technologies": [
     "Rust",
     "Actix-Web",
@@ -193,6 +193,60 @@
   },
 
   "status": "in development — backend API, smart contract, and mobile frontend are functional; WebSocket orchestrator, full transaction flow, and production deployment are in progress"
+},
+
+
+    {
+  "id": "redshift-sweeper-bot-for-ecommerce",
+
+  "title": "Redshift",
+
+  "summary": "A Solana-based custodial payment pipeline that processes orders through a multisig approval flow — backend receives orders, queues them in Redis, a worker orchestrates on-chain multisig creation → approval × 5 → treasury transfer, all monitored via a real-time terminal dashboard.",
+
+  "mediaLinks" : ["https://res.cloudinary.com/dp6i6a3xy/image/upload/v1784399811/Screenshot_2026-07-18_at_23.52.18_ixa1l7.png"],
+
+  "technologies": [
+    "Rust",
+    "Solana",
+    "Anchor",
+    "Actix-Web",
+    "Tokio",
+    "Diesel (PostgreSQL)",
+    "Redis",
+    "Ratatui (TUI)",
+    "Crossterm",
+    "Borsh",
+    "Solana SDK",
+    "Solana Client (RPC)"
+  ],
+
+  "role": "Full-stack developer — backend, worker, on-chain smart contracts, and TUI system monitor",
+
+  "whatItDoes": "Lets users purchase items using SOL through a custodial wallet system. The backend creates invoices, derives per-user Solana PDA wallets, and queues payment orders into Redis. A concurrent worker picks up jobs and executes a 3-step on-chain multisig flow: (1) create a transaction proposal, (2) collect 5 owner approvals, and (3) transfer funds to a treasury wallet. A terminal UI (TUI) provides real-time monitoring of the entire pipeline — service health, job stages, wallet balances, on-chain signatures, and live logs — with the ability to start/stop backend, worker, and script processes via hotkeys.",
+
+  "problem": "Processing Solana payments in a custodial setting requires multi-signature authorization to prevent single-point-of-failure theft. Without a multisig pipeline, a single compromised key could drain all user funds. Additionally, there's no visibility into the payment lifecycle once an order is placed — operators need real-time observability into queued jobs, approval progress, and on-chain confirmations.",
+
+  "approach": "Modular Rust workspace split into 5 crates: (1) **backend** — Actix-Web REST API handling user/item/order/invoice creation and PDA wallet derivation, (2) **services** — shared library for Diesel ORM models, Solana utility functions (wallet creation, funding, multisig transaction lifecycle), Redis job queue, and database connections, (3) **worker** — Tokio-based concurrent job processor with semaphore-limited parallelism that executes the create→approve→transfer pipeline and publishes events via Redis Pub/Sub, (4) **tui** — Ratatui-powered terminal dashboard with async pollers for health checks, queue depth, Redis pub/sub events, and process management, (5) **script** — load-testing utility that generates mock orders. On-chain logic uses two Anchor programs: a wallet contract for PDA management and a multisig contract implementing create_transaction, approve (×5 owners), and transfer instructions with PDA-seeded accounts.",
+
+  "highlights": [
+    "Full multisig payment pipeline: create → approve (5 owners) → transfer, entirely on Solana Devnet",
+    "Per-user PDA wallets derived deterministically from user IDs via program-owned PDAs",
+    "Concurrent job processing with Tokio semaphore (5 parallel jobs) and Redis RPOP batching",
+    "Real-time TUI dashboard (Ratatui) with service health monitoring, job stage tracking, wallet balances, and live log streaming",
+    "Redis Pub/Sub event bus connecting worker pipeline stages to the TUI for real-time observability",
+    "Process orchestration from TUI — start/stop backend, worker, and script processes via hotkeys with stdout capture",
+    "Anchor-based on-chain multisig contract with owner verification, approval tracking, and majority-based execution",
+    "Custodial wallet auto-funding: backend checks PDA balance and tops up before order processing",
+    "Diesel ORM with PostgreSQL for persistent order/user/item storage with UUID primary keys",
+    "Custom Anchor discriminator builder for manual instruction construction from the Rust client"
+  ],
+
+  "links": {
+    "live": "",
+    "github": "https://github.com/its-YogeshChandra/Redshift"
+  },
+
+  "status": "prototype"
 }
   ]
 }
