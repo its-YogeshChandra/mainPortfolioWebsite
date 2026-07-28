@@ -72,7 +72,7 @@
 
   "summary": "A context-aware encrypted video delivery platform exposed as an API. Upload an MP4 and CipherStream's AI pipeline automatically transcribes, detects sensitive content, applies AES-128 encrypted HLS streaming, generates chapters, and produces seek-bar thumbnail sprites — all with zero FFmpeg or crypto code on the client side.",
 
-  "mediaLinks" : ["https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783731609/Screenshot_2026-07-11_at_02.15.19_nwnout.png", "https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783731609/Screenshot_2026-07-11_at_02.15.39_iw5ym2.png", "https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783732994/Screenshot_2026-07-11_at_06.39.16_wcuhma.png"],
+  "mediaLinks" : ["https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783731609/Screenshot_2026-07-11_at_02.15.19_nwnout.png", "https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783731609/Screenshot_2026-07-11_at_02.15.39_iw5ym2.png","https://res.cloudinary.com/dp6i6a3xy/image/upload/v1783731610/Screenshot_2026-07-11_at_06.28.31_orlpwr.png"],
     "technologies": [
     "Rust",
     "Actix-Web",

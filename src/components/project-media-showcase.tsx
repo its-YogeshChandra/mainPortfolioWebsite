@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import type { ProjectMedia } from "@/lib/projects";
 
 type ProjectMediaShowcaseProps = {
@@ -8,39 +8,66 @@ type ProjectMediaShowcaseProps = {
   title: string;
 };
 
-const AUTO_CHANGE_MS = 6000;
+const IMAGE_AUTO_CHANGE_MS = 10000;
+const EMBED_AUTO_CHANGE_MS = 20000;
+const VIDEO_FALLBACK_AUTO_CHANGE_MS = 45000;
+const VIDEO_END_BUFFER_MS = 1000;
 
 export function ProjectMediaShowcase({ media, title }: ProjectMediaShowcaseProps) {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [activeVideoDurationMs, setActiveVideoDurationMs] = useState<number | null>(null);
   const hasMultipleMedia = media.length > 1;
   const activeMedia = media[activeIndex] ?? media[0];
 
-  useEffect(() => {
-    if (!hasMultipleMedia) {
-      return;
-    }
-
-    const intervalId = window.setInterval(() => {
-      setActiveIndex((currentIndex) => (currentIndex + 1) % media.length);
-    }, AUTO_CHANGE_MS);
-
-    return () => window.clearInterval(intervalId);
-  }, [hasMultipleMedia, media.length]);
-
-  const showPrevious = () => {
+  const showPrevious = useCallback(() => {
     setActiveIndex((currentIndex) =>
       currentIndex === 0 ? media.length - 1 : currentIndex - 1,
     );
-  };
+  }, [media.length]);
 
-  const showNext = () => {
+  const showNext = useCallback(() => {
     setActiveIndex((currentIndex) => (currentIndex + 1) % media.length);
-  };
+  }, [media.length]);
+
+  useEffect(() => {
+    setActiveVideoDurationMs(null);
+  }, [activeIndex, activeMedia?.src]);
+
+  useEffect(() => {
+    if (!hasMultipleMedia || !activeMedia) {
+      return;
+    }
+
+    const autoChangeDelay = (() => {
+      if (activeMedia.type === "video") {
+        return activeVideoDurationMs === null
+          ? VIDEO_FALLBACK_AUTO_CHANGE_MS
+          : Math.ceil(activeVideoDurationMs) + VIDEO_END_BUFFER_MS;
+      }
+
+      if (activeMedia.type === "embed") {
+        return EMBED_AUTO_CHANGE_MS;
+      }
+
+      return IMAGE_AUTO_CHANGE_MS;
+    })();
+
+    const timeoutId = window.setTimeout(showNext, autoChangeDelay);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [activeMedia, activeVideoDurationMs, hasMultipleMedia, showNext]);
 
   return (
     <div className="col-span-12 overflow-hidden border border-[#e5e7eb] bg-white transition-colors dark:border-[#262626] dark:bg-[#171717]">
       <div className="relative bg-[#f5f5f5] dark:bg-[#0a0a0a]">
-        <ProjectMediaItem media={activeMedia} title={`${title} media ${activeIndex + 1}`} />
+        <ProjectMediaItem
+          media={activeMedia}
+          title={`${title} media ${activeIndex + 1}`}
+          onVideoEnded={showNext}
+          onVideoLoadedMetadata={(duration) => {
+            setActiveVideoDurationMs(Number.isFinite(duration) ? duration * 1000 : null);
+          }}
+        />
 
         {hasMultipleMedia ? (
           <>
@@ -95,10 +122,14 @@ export function ProjectMediaItem({
   media,
   title,
   className = "w-full max-h-[720px] object-contain",
+  onVideoEnded,
+  onVideoLoadedMetadata,
 }: {
   media: ProjectMedia;
   title: string;
   className?: string;
+  onVideoEnded?: () => void;
+  onVideoLoadedMetadata?: (duration: number) => void;
 }) {
   if (media.type === "embed") {
     return (
@@ -116,10 +147,13 @@ export function ProjectMediaItem({
     return (
       <video
         src={media.src}
+        autoPlay
         controls
         muted
         playsInline
         preload="metadata"
+        onEnded={onVideoEnded}
+        onLoadedMetadata={(event) => onVideoLoadedMetadata?.(event.currentTarget.duration)}
         className={className}
       />
     );

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { projects, type PortfolioProject, type ProjectMedia } from "@/lib/projects";
+import socialLinksData from "../../context/social-links.json";
 
 const skills = [
   { label: "Languages", value: "HTML, CSS, JavaScript, TypeScript, Rust" },
@@ -20,6 +21,10 @@ const sectionHeadingClass =
 const sectionBodyClass =
   "text-[#737373] text-[16px] font-medium leading-relaxed dark:text-[#a3a3a3]";
 const keywordClass = "font-semibold text-[#171717] dark:text-[#f5f5f5]";
+const socialLinks = Object.entries(socialLinksData).map(([label, href]) => ({
+  label,
+  href: href.startsWith("http://") || href.startsWith("https://") ? href : `https://${href}`,
+}));
 
 export default function App() {
   const contactRef = useRef<HTMLElement>(null);
@@ -77,7 +82,7 @@ export default function App() {
               Description
             </p>
             <p className={sectionBodyClass}>
-              I build <strong className={keywordClass}>full-stack products</strong>
+              I build <strong className={keywordClass}>full-stack products</strong>{" "}
               across modern web and blockchain ecosystems, with a strong focus on
               <strong className={keywordClass}> Solana-based applications</strong>.
               My work spans frontend interfaces, backend APIs,
@@ -91,11 +96,14 @@ export default function App() {
             {/* Buttons */}
             <div className="flex gap-3 mt-2">
               <Button
+                asChild
                 variant="outline"
                 size="sm"
                 className="text-xs tracking-[0.12em] uppercase px-5 h-10 font-medium rounded-[3px] border-[#bfbfbf] dark:border-[#525252] dark:bg-[#171717] dark:text-[#f5f5f5] dark:hover:bg-[#262626]"
               >
-                Resume
+                <a href="/resume.pdf" target="_blank" rel="noreferrer">
+                  Resume
+                </a>
               </Button>
               <Button
                 variant="default"
@@ -198,13 +206,15 @@ export default function App() {
           {/* Bottom border + social links */}
           <div className="border-t border-[#e5e5e5] pt-6 dark:border-[#262626]">
             <div className="flex gap-7">
-              {["X.com", "LinkedIn", "Github"].map((link) => (
+              {socialLinks.map(({ label, href }) => (
                 <a
-                  key={link}
-                  href="#"
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noreferrer"
                   className="text-[#404040] text-[13px] font-medium hover:text-[#0a0a0a] transition-colors dark:text-[#d4d4d4] dark:hover:text-[#ffffff]"
                 >
-                  {link}
+                  {label}
                 </a>
               ))}
             </div>
