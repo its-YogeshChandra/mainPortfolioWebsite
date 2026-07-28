@@ -9,13 +9,9 @@ type ProjectMediaShowcaseProps = {
 };
 
 const IMAGE_AUTO_CHANGE_MS = 10000;
-const EMBED_AUTO_CHANGE_MS = 20000;
-const VIDEO_FALLBACK_AUTO_CHANGE_MS = 45000;
-const VIDEO_END_BUFFER_MS = 1000;
 
 export function ProjectMediaShowcase({ media, title }: ProjectMediaShowcaseProps) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const [activeVideoDurationMs, setActiveVideoDurationMs] = useState<number | null>(null);
   const hasMultipleMedia = media.length > 1;
   const activeMedia = media[activeIndex] ?? media[0];
 
@@ -30,32 +26,14 @@ export function ProjectMediaShowcase({ media, title }: ProjectMediaShowcaseProps
   }, [media.length]);
 
   useEffect(() => {
-    setActiveVideoDurationMs(null);
-  }, [activeIndex, activeMedia?.src]);
-
-  useEffect(() => {
-    if (!hasMultipleMedia || !activeMedia) {
+    if (!hasMultipleMedia || activeMedia?.type !== "image") {
       return;
     }
 
-    const autoChangeDelay = (() => {
-      if (activeMedia.type === "video") {
-        return activeVideoDurationMs === null
-          ? VIDEO_FALLBACK_AUTO_CHANGE_MS
-          : Math.ceil(activeVideoDurationMs) + VIDEO_END_BUFFER_MS;
-      }
-
-      if (activeMedia.type === "embed") {
-        return EMBED_AUTO_CHANGE_MS;
-      }
-
-      return IMAGE_AUTO_CHANGE_MS;
-    })();
-
-    const timeoutId = window.setTimeout(showNext, autoChangeDelay);
+    const timeoutId = window.setTimeout(showNext, IMAGE_AUTO_CHANGE_MS);
 
     return () => window.clearTimeout(timeoutId);
-  }, [activeMedia, activeVideoDurationMs, hasMultipleMedia, showNext]);
+  }, [activeMedia?.type, hasMultipleMedia, showNext]);
 
   return (
     <div className="col-span-12 overflow-hidden border border-[#e5e7eb] bg-white transition-colors dark:border-[#262626] dark:bg-[#171717]">
@@ -64,9 +42,6 @@ export function ProjectMediaShowcase({ media, title }: ProjectMediaShowcaseProps
           media={activeMedia}
           title={`${title} media ${activeIndex + 1}`}
           onVideoEnded={showNext}
-          onVideoLoadedMetadata={(duration) => {
-            setActiveVideoDurationMs(Number.isFinite(duration) ? duration * 1000 : null);
-          }}
         />
 
         {hasMultipleMedia ? (
@@ -123,13 +98,11 @@ export function ProjectMediaItem({
   title,
   className = "w-full max-h-[720px] object-contain",
   onVideoEnded,
-  onVideoLoadedMetadata,
 }: {
   media: ProjectMedia;
   title: string;
   className?: string;
   onVideoEnded?: () => void;
-  onVideoLoadedMetadata?: (duration: number) => void;
 }) {
   if (media.type === "embed") {
     return (
@@ -153,7 +126,6 @@ export function ProjectMediaItem({
         playsInline
         preload="metadata"
         onEnded={onVideoEnded}
-        onLoadedMetadata={(event) => onVideoLoadedMetadata?.(event.currentTarget.duration)}
         className={className}
       />
     );
